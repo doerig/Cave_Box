@@ -1,7 +1,7 @@
 {
   "version": "1.00",
   "projectName": "Project description",
-  "author": "s",
+  "author": "marti",
   "items": [
     {
       "parentId": 0,
@@ -566,7 +566,7 @@
       }
     ],
     "namingRecursive": false,
-    "useCppMain": false,
+    "useCppMain": true,
     "saveLocation": "ALL_TO_CURRENT",
     "usingSizedEEPROMStorage": true,
     "eepromDefinition": "eeprom:",

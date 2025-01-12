@@ -1,3 +1,4 @@
+
 /*
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -26,6 +27,7 @@ esp32 back to v2
 
 
 */
+#include <main.h>
 #define FIRMWARE_VERSION "1.04.1"
 //#define USE_PCB_OLED_V2 //Second milled board, first to use oled screen
 //#define USE_PCB_OLED_MODIFIED_PERFBOARD // 1st board made with perfboard, OLED added later
@@ -33,7 +35,7 @@ esp32 back to v2
 
 // #define USE_DHT22_SENSOR
 #define USE_AHT20_SENSOR
-
+#include <Arduino.h>
 #include "shroom_room_oled_tc_menu_menu.h"
 #include "Wire.h"
 #include "EEPROM.h"
