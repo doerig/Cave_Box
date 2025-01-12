@@ -26,7 +26,7 @@ esp32 back to v2
 
 
 */
-#define FIRMWARE_VERSION "1.04"
+#define FIRMWARE_VERSION "1.04.1"
 //#define USE_PCB_OLED_V2 //Second milled board, first to use oled screen
 //#define USE_PCB_OLED_MODIFIED_PERFBOARD // 1st board made with perfboard, OLED added later
 #define USE_PCB_OLED_V3 //3rd milled board, has oled screen and bought mister board.
@@ -367,12 +367,12 @@ void checkHumidityAcheivable() {
   // and display a message stating that the controller was unable to reach the asked for setpoint
   // so it has been changed. 2*60*60*1000 = 7200000 milliseconds = 2 hours
   
-  if (RH >= presetArr[menuPresets.getCurrentValue()].RHSetPoint) {
+  if (presetArr[menuPresets.getCurrentValue()].RHSetPoint - RH <= 10) {
     // If RH>=setpoint we know it's acheivable so reset the timer. If it can't be acheived later on
     // probablly the water needs refilling.
     PIDOnStartTime = millis();
   }
-  if (millis() - PIDOnStartTime >= 7200000.) { // 7200000.
+  if (millis() - PIDOnStartTime >= 14400000.) { // 7200000.
     RHErrorState();
   }
 }
@@ -653,7 +653,7 @@ void RHErrorState() {
   // If setpoint cannot be reached it displays an acheivable setpoint.
   
   Serial.println("Setpoint Unatainable");
-  menuControllerBool.setBoolean(0);//turn off the controller
+  //MD menuControllerBool.setBoolean(0);//turn off the controller
   //Make the error noticable by changing the colour to solid red.
   LEDWarningColour();
  // Serial.println("LED red");
