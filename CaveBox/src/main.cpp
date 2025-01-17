@@ -28,7 +28,7 @@ esp32 back to v2
 
 */
 #include <main.h>
-#define FIRMWARE_VERSION "1.04.1"
+#define FIRMWARE_VERSION "1.04.2"
 //#define USE_PCB_OLED_V2 //Second milled board, first to use oled screen
 //#define USE_PCB_OLED_MODIFIED_PERFBOARD // 1st board made with perfboard, OLED added later
 #define USE_PCB_OLED_V3 //3rd milled board, has oled screen and bought mister board.
@@ -41,14 +41,14 @@ esp32 back to v2
 #include "EEPROM.h"
 #ifdef USE_DHT22_SENSOR
   #include "DHT.h"
+  #include "sensors/RhTempSensorDht.cpp"
 #endif
 #ifdef USE_AHT20_SENSOR
   #include <Adafruit_AHTX0.h>
+  #include "sensors/RhTempSensorAht20.cpp"
 #endif
 #include <PID_v1.h>
 #include <FastLED.h>
-
-
 
 #define PRESET_ARRAY_ADDRESS 28 //Address after tcMenu items, needs to be updated if more EERPOM using variables are created with tcMenu.
 
@@ -162,12 +162,11 @@ struct preset { //https://arduino.stackexchange.com/questions/25945/how-to-read-
 CRGB leds[NUM_LEDS];
 
 #ifdef USE_DHT22_SENSOR
-  DHT dht(DHT_PIN, DHT22);
+  RhTempSensorDht rhTempSensor = RhTempSensorDht(DHT_PIN);
 #endif
 
 #ifdef USE_AHT20_SENSOR
-  Adafruit_AHTX0 aht;
-  TwoWire I2CAHT = TwoWire(1); // Use 2nd i2c interface for sensor.
+  RhTempSensorAht20 rhTempSensor = RhTempSensorAht20(AHT_SDA_PIN, AHT_SCL_PIN);
 #endif
   
 PID RHPID(&RHInput, &RHOutput, &RHSetPoint, RHKp, RHKi, RHKd, DIRECT); 
@@ -180,18 +179,7 @@ void setup() {
   setupMenu();
   Wire.begin();
 
-  #ifdef USE_DHT22_SENSOR
-    dht.begin();
-  #endif
-  
-  #ifdef USE_AHT20_SENSOR
-    I2CAHT.begin(AHT_SDA_PIN, AHT_SCL_PIN, 100000);
-//    aht.begin(&I2CAHT);
-//    Serial.println("i2c init");
-    if (! aht.begin(&I2CAHT)) {
-      Serial.println("Could not find AHT? Check wiring");
-    }
-  #endif
+  rhTempSensor.setup();
   
   pinMode(MISTER_PIN, OUTPUT);
   pinMode(FAN_PIN, OUTPUT);
@@ -299,19 +287,9 @@ int updateDHT() {
   if (millis() - loopStartTime > LOOP_TIME) { // Following section runs every 2 seconds.
     loopStartTime += LOOP_TIME;
 
-    #ifdef USE_DHT22_SENSOR
-      RH = dht.readHumidity();
-      T = dht.readTemperature();
-    #endif
-    
-    #ifdef USE_AHT20_SENSOR
-      sensors_event_t humidity;
-      sensors_event_t temp;
-      aht.getEvent(&humidity, &temp);
-      RH = humidity.relative_humidity;
-      T = temp.temperature;
-    #endif
-    
+    RhTempData rht = rhTempSensor.getSensorData();
+    RH = rht.relativeHumidity;
+    T = rht.temperature;
     
     // Check if any reads failed and exit early (to try again).
     if (isnan(RH) || isnan(T) || RH == 0.0 || T == 0.0 ) {
