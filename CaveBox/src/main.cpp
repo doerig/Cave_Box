@@ -203,7 +203,7 @@ void setup() {
   FastLED.addLeds<WS2812, WS2812_PIN, GRB>(leds, NUM_LEDS); 
   //Generate array containing oscillating brightness values for the led.
   float angleStep = 6.283/(float)LED_ARRAY_LENGTH;
-  for (int i = 0; i <= LED_ARRAY_LENGTH; i++){ 
+  for (int i = 0; i < LED_ARRAY_LENGTH; i++){ 
     sinArray[i] = int((sin(i*angleStep)+1.25)*255./(1. + 1.25));
   }
   
