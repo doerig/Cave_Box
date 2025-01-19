@@ -1,30 +1,22 @@
-#include "IRhTempSensor.h"
-#include <DHT.h>
+#include "RhTempSensorDht.h"
 
-class RhTempSensorDht : IRhTempSensor {
-private:
-    int ahtSdaPin;
-    int ahtSclPin;
-    DHT dht;
-public:
-    RhTempSensorDht(int dhtPin) : dht(dhtPin, DHT22)
-    {
-    }
+RhTempSensorDht::RhTempSensorDht(int dhtPin) : dht(dhtPin, DHT22)
+{
+}
 
-    ~RhTempSensorDht() override
-    {
-    }
+RhTempSensorDht::~RhTempSensorDht()
+{
+}
 
-    void setup() override
-    {
-        dht.begin();
-    }
+void RhTempSensorDht::setup()
+{
+    dht.begin();
+}
 
-    RhTempData getSensorData() override
-    {
-        RhTempData rhTempData;
-        rhTempData.relativeHumidity = dht.readHumidity();
-        rhTempData.temperature = dht.readTemperature();
-        return rhTempData;
-    }
-};
+RhTempData RhTempSensorDht::getSensorData()
+{
+    RhTempData rhTempData;
+    rhTempData.relativeHumidity = dht.readHumidity();
+    rhTempData.temperature = dht.readTemperature();
+    return rhTempData;
+}

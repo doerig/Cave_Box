@@ -41,14 +41,15 @@ esp32 back to v2
 #include "Wire.h"
 #include "EEPROM.h"
 #ifdef USE_DHT22_SENSOR
-  #include "sensors/RhTempSensorDht.cpp"
+  #include "sensors/RhTempSensorDht.h"
 #endif
 #ifdef USE_AHT20_SENSOR
-  #include "sensors/RhTempSensorAht20.cpp"
+  #include "sensors/RhTempSensorAht20.h"
 #endif
 #ifdef USE_SHT31_SENSOR
-  #include "sensors/RhTempSensorSht31.cpp"
+  #include "sensors/RhTempSensorSht31.h"
 #endif
+#include "sensors/RhTempSensor.h"
 #include <PID_v1.h>
 #include <FastLED.h>
 
@@ -161,15 +162,15 @@ struct preset { //https://arduino.stackexchange.com/questions/25945/how-to-read-
 CRGB leds[NUM_LEDS];
 
 #ifdef USE_DHT22_SENSOR
-  RhTempSensorDht rhTempSensor = RhTempSensorDht(DHT_PIN);
+  IRhTempSensor* rhTempSensor= RhTempSensorDht(DHT_PIN);
 #endif
 
 #ifdef USE_AHT20_SENSOR
-  RhTempSensorAht20 rhTempSensor = RhTempSensorAht20(AHT_SDA_PIN, AHT_SCL_PIN);
+  IRhTempSensor* rhTempSensor = RhTempSensorAht20(AHT_SDA_PIN, AHT_SCL_PIN);
 #endif
 
 #ifdef USE_SHT31_SENSOR
-  RhTempSensorSht31 rhTempSensor = RhTempSensorSht31(AHT_SDA_PIN, AHT_SCL_PIN);
+  RhTempSensor* rhTempSensor = new RhTempSensorSht31(AHT_SDA_PIN, AHT_SCL_PIN);
 #endif
   
 PID RHPID(&RHInput, &RHOutput, &RHSetPoint, RHKp, RHKi, RHKd, DIRECT); 
@@ -182,7 +183,7 @@ void setup() {
   setupMenu();
   Wire.begin();
 
-  rhTempSensor.setup();
+  rhTempSensor->setup();
   
   pinMode(MISTER_PIN, OUTPUT);
   pinMode(FAN_PIN, OUTPUT);
@@ -290,7 +291,7 @@ int updateDHT() {
   if (millis() - loopStartTime > LOOP_TIME) { // Following section runs every 2 seconds.
     loopStartTime += LOOP_TIME;
 
-    RhTempData rht = rhTempSensor.getSensorData();
+    RhTempData rht = rhTempSensor->getSensorData();
     RH = rht.relativeHumidity;
     T = rht.temperature;
     

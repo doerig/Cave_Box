@@ -1,16 +1,16 @@
-#ifndef IRHTEMPSENSOR_H
-#define IRHTEMPSENSOR_H
+#ifndef RHTEMPSENSOR_H
+#define RHTEMPSENSOR_H
 
 struct RhTempData {
     double temperature;
     double relativeHumidity;
 };
 
-class IRhTempSensor {
+class RhTempSensor {
 public: 
     virtual void setup() = 0;
     virtual RhTempData getSensorData() = 0;
-    virtual ~IRhTempSensor() {}
+    virtual ~RhTempSensor() {}
 };
 
-#endif /*IRHTEMPSENSOR_H*/
+#endif /*RHTEMPSENSOR_H*/
