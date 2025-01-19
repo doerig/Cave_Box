@@ -34,18 +34,20 @@ esp32 back to v2
 #define USE_PCB_OLED_V3 //3rd milled board, has oled screen and bought mister board.
 
 // #define USE_DHT22_SENSOR
-#define USE_AHT20_SENSOR
+// #define USE_AHT20_SENSOR
+#define USE_SHT31_SENSOR
 #include <Arduino.h>
 #include "shroom_room_oled_tc_menu_menu.h"
 #include "Wire.h"
 #include "EEPROM.h"
 #ifdef USE_DHT22_SENSOR
-  #include "DHT.h"
   #include "sensors/RhTempSensorDht.cpp"
 #endif
 #ifdef USE_AHT20_SENSOR
-  #include <Adafruit_AHTX0.h>
   #include "sensors/RhTempSensorAht20.cpp"
+#endif
+#ifdef USE_SHT31_SENSOR
+  #include "sensors/RhTempSensorSht31.cpp"
 #endif
 #include <PID_v1.h>
 #include <FastLED.h>
@@ -71,11 +73,8 @@ esp32 back to v2
   const int FAN_TACH_PIN = 4;
   const int WS2812_PIN = 5;
   const int PROG_FREQ_PIN = 33;
-  #ifdef USE_AHT20_SENSOR
-    const int AHT_SCL_PIN = 27;
-    const int AHT_SDA_PIN = 17;
-  #endif
-
+  const int AHT_SCL_PIN = 27;
+  const int AHT_SDA_PIN = 17;
 
   //Following are output pins to connect SSR to to use the Cave Box as a controller for AC equipement
   const int EXT_FAN_PIN = 32; //pin 6 on header red LED testing
@@ -167,6 +166,10 @@ CRGB leds[NUM_LEDS];
 
 #ifdef USE_AHT20_SENSOR
   RhTempSensorAht20 rhTempSensor = RhTempSensorAht20(AHT_SDA_PIN, AHT_SCL_PIN);
+#endif
+
+#ifdef USE_SHT31_SENSOR
+  RhTempSensorSht31 rhTempSensor = RhTempSensorSht31(AHT_SDA_PIN, AHT_SCL_PIN);
 #endif
   
 PID RHPID(&RHInput, &RHOutput, &RHSetPoint, RHKp, RHKi, RHKd, DIRECT); 
