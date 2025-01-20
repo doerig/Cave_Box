@@ -28,7 +28,7 @@ esp32 back to v2
 
 */
 #include <main.h>
-#define FIRMWARE_VERSION "1.04.2"
+#define FIRMWARE_VERSION "1.1"
 //#define USE_PCB_OLED_V2 //Second milled board, first to use oled screen
 //#define USE_PCB_OLED_MODIFIED_PERFBOARD // 1st board made with perfboard, OLED added later
 #define USE_PCB_OLED_V3 //3rd milled board, has oled screen and bought mister board.
@@ -240,7 +240,7 @@ void loop() {
   
   if (menuControllerBool.getBoolean()) {
      //These functions run continuously if controler is on.
-    outputPID(); // Controls the mister.
+    controlHumidity(); // Controls the mister.
     updateLED(); // Has to be before checkHumidityAcheivable and fanControl else it will turn of the WARNING_COLOUR before the controller switched off. 
     checkHumidityAcheivable(); //Ensures that the setpoint has been reached fairly recently
     fanControl(); 
@@ -332,13 +332,11 @@ int updateDHT() {
   return 0;
 }
 
-void outputPID() {
-  //runs continuously when controller is running
-  //turn analog PID output into very slow pwm to drive the ultrasonic mister:
-  if (RHOutput > millis() - loopStartTime){
+void controlHumidity() {
+  if(RH < RHSetPoint){
     increaseRH();
   }
-  else{
+  else {
     decreaseRH();
   }
 }
@@ -524,7 +522,7 @@ void measureAirExchangeTime() {
   
   while(RH < presetArr[menuPresets.getCurrentValue()].RHSetPoint){
     if (updateDHT() == 1) { continue; }
-    outputPID();
+    controlHumidity();
   }
   
   // Leave it to mix 
@@ -563,19 +561,16 @@ void measureAirExchangeTime() {
 
 void increaseRH() {
   //turns on mister and fan.
+
   if (!isMisterOn) {
     //Serial.println("incRH ");
-    if (isMisterOn == 0) {
-      // This section only runs the first time mister is switched on in a cycle.
-      activateFan = 1;
-      fanOnStartTime = millis();
-    }
-    activateFan = 1;
-    fanOnStartTime = millis();
     ledcWrite(0, 119);// 119/255=47% duty cycle
     digitalWrite(EXT_HUMIDIFIER_PIN, HIGH);
     isMisterOn = 1;
   }
+
+  activateFan = 1;
+  fanOnStartTime = millis();
 }
 
 void decreaseRH() {

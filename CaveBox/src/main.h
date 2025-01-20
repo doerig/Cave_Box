@@ -5,7 +5,7 @@ void changeRHSetpoint(double newSetPoint);
 void setFAEInterval();
 void initController();
 int updateDHT();
-void outputPID();
+void controlHumidity();
 void updateLED();
 void checkHumidityAcheivable();
 void fanControl();
